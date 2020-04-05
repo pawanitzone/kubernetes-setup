@@ -1,0 +1,40 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+   - name: Setup service account for helm
+     shell:
+      cmd: |
+       cat <<EOF | kubectl create -f -
+       apiVersion: v1
+       kind: ServiceAccount
+       metadata:
+        name: tiller
+        namespace: kube-system
+       ---
+       apiVersion: rbac.authorization.k8s.io/v1
+       kind: ClusterRoleBinding
+       metadata:
+        name: tiller
+       roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-admin
+       subjects:
+        - kind: ServiceAccount
+          name: tiller
+          namespace: kube-system         
+       EOF
+       
+     args: 
+       executable: /bin/bash
+       
+   - name: Install & Setup Helm
+     command: "{{item}}"
+     with_items:
+      - yum install wget -y
+      - wget https://get.helm.sh/helm-v2.16.5-linux-amd64.tar.gz
+      - tar -xvf helm-v2.16.5-linux-amd64.tar.gz
+      - mv linux-amd64/helm  /usr/bin/helm
+      - helm init --service-account tiller --upgrade
+      - helm repo update

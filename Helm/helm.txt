@@ -1,0 +1,206 @@
+##########  Install Helm#############
+
+
+###Download your desired version: https://github.com/helm/helm/releases
+Unpack it (tar -zxvf helm-v2.0.0-linux-amd64.tgz)
+Find the helm binary in the unpacked directory, and move it to its desired destination (mv linux-amd64/helm /usr/bin/helm)
+###############
+##below command to fix the issue of serviceaccount permission
+
+
+### ServiceAccount
+vi serviceaccount.yaml
+-------------------------------
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+-------------------------------
+
+      
+helm init --service-account tiller --upgrade
+helm ls (Verify for service account working for helm)
+
+###Deployed Nginx Ingress controller using helm
+helm repo update
+helm install stable/nginx-ingress --name nginx-ingress --set controller.publishService.enabled=true
+
+
+NOTE:  ####
+- nginx ingress controller service doesn't pick loadbalancer IP on bare metal kubernetes cluster. So need to manually configure 
+- kubectl get svc
+##Convert svc into yaml
+- kubectl get svc nginx-ingress-controller -o yaml > nginx-ingress-controller-svc.yaml
+##Edit
+- vi nginx-ingress-controller-svc.yaml
+--Add lines for loadbalancer ip
+------------
+spec:
+  externalIPs:
+  - 192.168.56.100
+  - 192.168.56.101
+  - 192.168.56.102
+------------------------------------------------ 
+
+### Delete service 'nginx-ingress-controller' and recreate using nginx-ingress-controller-svc.yaml
+- kubectl delete svc nginx-ingress-controller 
+- kubectl create -f nginx-ingress-controller-svc.yaml
+
+
+
+*****************************************************************************************************************************************
+##Now setup ingress for service
+######Example1
+###########Service
+-------------------------
+apiVersion: v1
+kind: Service
+metadata:
+   name: nginx-pod-service
+
+spec:
+  selector:
+   app: nginxlabel
+   tier: front-end
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---------------------------------------
+###########Ingress
+-----------
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx-pod-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+
+spec:
+    rules:
+      - host: www.devops.com
+        http:
+          paths:
+            - backend:
+                serviceName: nginx-pod-service
+                servicePort: 80
+              path: /
+--------------------------------------------------------
+
+#####Note: Create DNS of '- Host: www.devops.com' and using LoadBalancer IP address.
+
+##############Example2
+#####Pod & Service
+-------------------------
+kind: Pod
+apiVersion: v1
+metadata:
+  name: banana-app
+  labels:
+    app: banana
+spec:
+  containers:
+    - name: banana-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=banana"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: banana-service
+spec:
+  selector:
+    app: banana
+  ports:
+    - port: 5678 # Default port for image
+----------------------------------------------
+
+##########INgress 
+--------------------
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example-ingress
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /banana
+          backend:
+            serviceName: banana-service
+            servicePort: 5678
+
+			
+-------------------------------------------------------------
+
+
+
+
+Example:
+https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nginx-ingress-on-digitalocean-kubernetes-using-helm
+https://akomljen.com/kubernetes-nginx-ingress-controller/
+
+
+NOTES:
+The nginx-ingress controller has been installed.
+It may take a few minutes for the LoadBalancer IP to be available.
+You can watch the status by running 'kubectl --namespace default get services -o wide -w my-release-nginx-ingress-controller'
+
+An example Ingress that makes use of the controller:
+
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    name: example
+    namespace: foo
+  spec:
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - backend:
+                serviceName: exampleService
+                servicePort: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+        - hosts:
+            - www.example.com
+          secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
+
+
+
+
