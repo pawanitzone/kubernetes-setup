@@ -1,0 +1,12 @@
+##Read This document for more details inforamation and to know the process to deploy
+https://blog.alexellis.io/move-your-project-to-kubernetes/
+
+https://hackernoon.com/deploying-php-apps-with-docker-8bccae5a33f7
+
+##App to deploy: Kubernetes:IMP
+### Code and yaml for this project: 
+https://github.com/heptio/example-lamp  
+
+
+### How to process.
+http://docs.heptio.com/content/tutorials/lamp.html

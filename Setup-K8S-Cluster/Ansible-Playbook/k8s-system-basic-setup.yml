@@ -1,0 +1,81 @@
+### After runing all these basic settings run below commands
+### #kubeadm init --apiserver-advertise-address=192.168.56.10 --pod-network-cidr=10.244.0.0/16  # replace apiserver-advertise-address with Master server from from group
+### This above command will give you output of token which require by minions node to join kubernetes master
+### Like: kubeadm join 192.168.56.10:6443 --token 5s64mv.60wmxu0gmfvwvf4g --discovery-token-ca-cert-hash sha256:26a784742e6304110d46c053c7f25833141c96c8542878fdf52ffdab33726c2b 
+### Deploy kubernetes network call flannel
+### #kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+#NOTE: If firewall is enabled on your installed RedHat/CentOS system, uncomment 17-21 lines which is commented below.
+#CREATED BY: pawanittraining@gmail.com
+ 
+---
+- hosts: all
+  become: yes
+  tasks:  
+   - name: Disable selinux permanently
+     selinux:
+      state: disabled
+  
+#   - name: Stop firewalld aur keep it on if you know how to operate firewall
+#     command: "{{item}}"
+#      with_items:
+#        - systemctl stop firewalld
+#        - systemctl disable firewalld
+  
+   - name: Disable SWAP
+     command: "{{item}}"
+     with_items:
+       - swapoff -a
+       - sed -e '/swap/ s/^#*/#/' -i /etc/fstab 
+  
+   - name: Install Docker-ce
+     command: "{{item}}"
+     with_items:
+       - yum install -y yum-utils device-mapper-persistent-data lvm2
+       - yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+       - yum install -y docker-ce
+    
+   - name: Add kubernetes repository
+     shell:
+      cmd: |
+       cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+       [kubernetes]
+       name=Kubernetes
+       baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+       enabled=1
+       gpgcheck=1
+       repo_gpgcheck=1
+       gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+               https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+       EOF
+     
+     args: 
+       executable: /bin/bash
+     
+  
+   - name: Install Kubernetes and its dependencies 
+     command: yum install -y kubelet kubeadm kubectl
+
+   - name: Backup docker.service file
+     command: cp -r  /usr/lib/systemd/system/docker.service /usr/lib/systemd/system/docker.service.org
+
+   - name: change cgroupfs to systemd
+     lineinfile:
+        path: /usr/lib/systemd/system/docker.service
+        regexp: '^ExecStart='
+        line: 'ExecStart=/usr/bin/dockerd --exec-opt native.cgroupdriver=systemd'
+
+  
+   - name: Start docker and kubernetes services 
+     command: "{{item}}"
+     with_items:  
+       - systemctl daemon-reload
+       - systemctl start docker
+       - systemctl enable docker
+       - systemctl start kubelet
+       - systemctl enable kubelet
+
+    
+   - name: Enable br_netfilter Kernel Module The br_netfilter module is required for kubernetes installation. Enable this kernel module so that the packets traversing the bridge are processed by iptables for filtering and for port forwarding, and the kubernetes pods across the cluster can communicate with each other.
+     command: echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables 
+    

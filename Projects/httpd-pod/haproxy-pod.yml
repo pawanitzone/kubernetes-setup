@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+   name: cadenthaproxy
+   labels:
+     app: haproxy
+     type: front-end
+spec:
+   containers:
+   - name: cadent-hapoxy
+     image: pawanitzone/cadent-hapoxy:latest
+     ports:
+     - containerPort: 80
+     securityContext:
+      capabilities:
+        add:
+         - NET_ADMIN

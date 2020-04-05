@@ -1,0 +1,39 @@
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended/kubernetes-dashboard.yaml
+# $ cat <<EOF | kubectl create -f -
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: kubernetes-dashboard
+  labels:
+    k8s-app: kubernetes-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: kubernetes-dashboard
+  namespace: kube-system
+EOF
+
+
+# ### Skip Login 
+##kubectl edit deployment/kubernetes-dashboard --namespace=kube-system
+
+###Comment readme#############
+
+If you are using dashboard version v1.10.1 or later, you must also add --enable-skip-login to the deployment's command line arguments. You can do so by adding it to the args in kubectl edit deployment/kubernetes-dashboard --namespace=kube-system.
+
+Example:
+
+      containers:
+      - args:
+        - --auto-generate-certificates
+        - --enable-skip-login            # <-- add this line
+        image: k8s.gcr.io/kubernetes-dashboard-amd64:v1.10.1
+
+
+#############################################################################
+
+#### Start dashboard
+# nohup kubectl proxy --address="172.24.20.164" -p 8443 --accept-hosts='^*$' &

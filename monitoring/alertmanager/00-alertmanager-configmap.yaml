@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: alertmanager
+  namespace: monitoring
+data:
+  config.yml: |-
+    global:
+     smtp_smarthost: smtp.blackarrow-corp.com:25
+     smtp_from: alertmanager@cadent.tv
+     smtp_require_tls: false
+    templates:
+    - '/etc/alertmanager-templates/*.tmpl'
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 30s
+      repeat_interval: 1m  
+      receiver: mail
+    
+    receivers:
+     - name: 'mail'
+       email_configs:
+       - to: pkumar@cadent.tv
+         send_resolved: true
+

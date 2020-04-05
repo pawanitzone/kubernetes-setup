@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cadent-hapoxy-service
+spec:
+  type: NodePort
+  ports:
+  - targetPort: 80
+    port: 80
+    nodePort: 30009
+    protocol: TCP
+    name: http
+  selector:
+   app: haproxy                  ##Use label define in pod-haproxy.yml
+   type: front-end

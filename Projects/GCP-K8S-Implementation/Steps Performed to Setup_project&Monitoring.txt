@@ -1,0 +1,61 @@
+gcloud container clusters get-credentials learnk8s --zone us-central1-a --project true-tooling-255910
+
+-------------------------------------------------
+Deploy fleetman applicaion 
+--------------------------------------
+    2  vi workload.yaml
+    3  vi storage.yaml
+    4  vi service.yaml
+    5  vi mongo-stack.yaml
+    6  kubectl apply -f workload.yaml
+    7  kubectl apply -f storage.yaml
+    8  kubectl apply -f service.yaml
+    9  kubectl apply -f mongo-stack.yaml
+-----------------------
+Done
+-------------------------------------------------------
+
+-------------------------
+Create service account to use helm 
+------------------------------
+   23  vi  serviceaccount.yaml
+   ---------------------------------------------
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+   _________________________________________
+   
+   
+   24  kubectl apply -f serviceaccount.yaml
+   25  helm ls
+   27  helm install --name monitoring --namespace monitoring stable/prometheus-operator
+   31  kubectl get all -n monitoring
+   32  kubectl edit -n monitoring service/monitoring-prometheus-oper-prometheus
+-------------------------
+If you would like to access only prometheus dashboard for monitoring then edit 32 step command and change type ClusterIP to LoadBalancer
+------------------------------------
+
+   36  kubectl edit -n monitoring service/monitoring-grafana
+---------------------------------------
+If you would like to access only Grafana dashboard for monitoring then edit 36 step command and change type ClusterIP to LoadBalancer
+-------------------------------------------------
+   37  kubectl get all -n monitoring
+-----------------
+Copy external IP address and port and access from browser.
+Username: admin
+Password: prom-operator
