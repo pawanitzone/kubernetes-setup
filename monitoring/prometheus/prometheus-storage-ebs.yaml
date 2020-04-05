@@ -9,7 +9,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   awsElasticBlockStore:
-    volumeID: vol-0caffdbdae0ffe6a5
+    volumeID: 'vol-0caffdbdae0ffe6a5'
     fsType: xfs
 ---
 kind: PersistentVolumeClaim
