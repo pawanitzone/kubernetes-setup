@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-volume-1
+  namespace: monitoring
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  awsElasticBlockStore:
+    volumeID: vol-0da92c984bac0d4e9
+    fsType: xfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: prometheus-claim
+  namespace: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+resources:
+  requests:
+    storage: 5i
+   selector:
+    matchLabels:
+      type: data-volume-1
