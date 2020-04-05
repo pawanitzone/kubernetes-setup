@@ -8,7 +8,6 @@ spec:
     storage: 5Gi
   accessModes:
   - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
   awsElasticBlockStore:
     volumeID: vol-0da92c984bac0d4e9
     fsType: xfs
