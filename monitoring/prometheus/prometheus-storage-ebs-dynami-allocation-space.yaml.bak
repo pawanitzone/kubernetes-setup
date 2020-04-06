@@ -1,0 +1,47 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+  namespace: monitoring
+
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+mountOptions:
+  - debug
+volumeBindingMode: Immediate
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-volume-1
+  namespace: monitoring
+  labels:
+   type: prometheus-ebs-vol
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  awsElasticBlockStore:
+    volumeID: vol-049878f594da473ef
+    fsType: xfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: prometheus-claim
+  namespace: monitoring
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "fast"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+   requests:
+    storage: 5Gi
