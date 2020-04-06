@@ -37,7 +37,7 @@ metadata:
   name: prometheus-claim
   namespace: monitoring
   annotations:
-    volume.beta.kubernetes.io/storage-class: "fast"
+#    volume.beta.kubernetes.io/storage-class: "fast"
 spec:
   accessModes:
     - ReadWriteOnce
