@@ -1,0 +1,28 @@
+#Need to run this on node which will play worker node in kubernetes cluster
+# Also pick the token and cacerthasses from master server /tmp/output-of-init.txt and replace below
+# now get complete host name of node:Run this command to get hostname on wordker node and replace below in nodeRegistration: 
+# # curl http://169.254.169.254/latest/meta-data/local-hostname
+- hosts: all
+  become: yes
+  tasks: 
+   - name: copy node.yml to node /etc/kubernetes/node.yml
+     shell:
+     cmd: |
+       cat <<EOF > /etc/kubernetes/node.yml
+       ---
+       apiVersion: kubeadm.k8s.io/v1beta1
+       kind: JoinConfiguration
+       discovery:  
+          bootstrapToken:
+           token: "35qp8n.hj21uixmpxr64w3u"
+           apiServerEndpoint: "172.16.1.196:6443"
+           caCertHashes:
+            - "sha256:23a298e251e3638f1d4adb272ab584f90f24f4e72c38cfa10c135c193c0d6262"
+       nodeRegistration:
+         name: ip-172-16-2-76.ap-south-1.compute.internal
+         kubeletExtraArgs:
+           cloud-provider: aws
+       EOF
+       
+   - name: run kubeadm join command
+     command: kubeadm join --config /etc/kubernetes/node.yml > /tmp/output-of-join.txt

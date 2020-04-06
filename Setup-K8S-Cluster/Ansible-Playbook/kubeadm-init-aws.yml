@@ -1,12 +1,31 @@
----
-apiVersion: kubeadm.k8s.io/v1beta2
-kind: ClusterConfiguration
-networking:
-  serviceSubnet: "10.100.0.0/16"
-  podSubnet: "10.244.0.0/16"
-apiServer:
-  extraArgs:
-    cloud-provider: "aws"
-controllerManager:
-  extraArgs:
-    cloud-provider: "aws"
+- hosts: all
+  become: yes
+  tasks:
+    - name: Copy required file to /etc/kubernetes/aws.yml
+      shell:
+        cmd: | 
+         cat <<EOF > /etc/kubernetes/aws.yml
+         ---
+         apiVersion: kubeadm.k8s.io/v1beta2
+         kind: ClusterConfiguration
+         networking:
+           serviceSubnet: "10.100.0.0/16"
+           podSubnet: "10.244.0.0/16"
+         apiServer:
+           extraArgs:
+            cloud-provider: "aws"
+         controllerManager:
+          extraArgs:
+           cloud-provider: "aws"
+         EOF
+         
+    - name: initialize kubeadm to create kubernetes cluster
+      command: kubeadm init --config /etc/kubernetes/aws.yml > /tmp/output-of-init.txt
+      
+    - name: Add required files
+      command: "{{item}}"
+      with_items:
+       - mkdir -p $HOME/.kube
+       - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
+       - sudo chown $(id -u):$(id -g) $HOME/.kube/config 
+    

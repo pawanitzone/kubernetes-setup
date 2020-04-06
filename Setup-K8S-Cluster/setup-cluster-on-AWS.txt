@@ -1,0 +1,14 @@
+AWS:
+Hardware:
+1. CPU and RAM = 2GB Minimum
+
+2. After instance launch create tag of instances of kubernetes cluster:
+   kubernetes.io/cluster/c-minion1    Value: owned
+   
+3. Persistent volumes required:
+   a. create ebs volume in AZ where you minion1 created. 
+   b. copy volumeID
+   c. Paste: github: pawanitzone/kubernetes/monitoring/prometheus/prometheus-storage-ebs-dynami-allocation-space.yaml 
+
+
+ 
