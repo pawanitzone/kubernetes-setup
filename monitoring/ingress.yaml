@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: app/v1
 kind: Ingress
 metadata:
   name: grafana
@@ -7,21 +7,21 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: k8s-grafana.eng.pvt
+  - host: k8s-grafana.hire.com
     http:
       paths:
       - path: /
         backend:
           serviceName: grafana
           servicePort: 3000
-  - host: k8s-prometheus.eng.pvt
+  - host: k8s-prometheus.hire.com
     http:
       paths:
       - path: /
         backend:
           serviceName: prometheus-service
           servicePort: 9090
-  - host: k8s-alertmanager.eng.pvt
+  - host: k8s-alertmanager.hire.com
     http: 
       paths:
       - path: /
