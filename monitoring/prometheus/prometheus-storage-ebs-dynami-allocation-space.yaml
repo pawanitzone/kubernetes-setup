@@ -1,14 +1,20 @@
-apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: fast
+  namespace: monitoring
   annotations:
     storageclass.beta.kubernetes.io/is-default-class: "true"
-  labels:
-    kubernetes.io/cluster-service: "true"
+
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: gp2
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+mountOptions:
+  - debug
+volumeBindingMode: Immediate
+
 
 ---
 apiVersion: v1
