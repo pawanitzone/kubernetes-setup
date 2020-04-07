@@ -11,8 +11,8 @@ metadata:
 data:
   config.yml: |-
     global:
-     smtp_smarthost: smtp.blackarrow-corp.com:25
-     smtp_from: alertmanager@cadent.tv
+     smtp_smarthost: smtp.gmail.com:465
+     smtp_from: alertmanager@hire.com
      smtp_require_tls: false
     templates:
     - '/etc/alertmanager-templates/*.tmpl'
@@ -26,6 +26,6 @@ data:
     receivers:
      - name: 'mail'
        email_configs:
-       - to: pkumar@cadent.tv
+       - to: awspractice1999@gmail.com
          send_resolved: true
 
