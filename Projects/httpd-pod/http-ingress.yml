@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: web-ingress
+spec:
+ rules:
+  - host: web.hire.com
+    http:
+     paths: 
+      - backend: 
+          serviceName: web-service
+          servicePort: 80
+     

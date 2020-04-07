@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2020-04-06T11:34:37Z"
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: nginx-ingress
+    chart: nginx-ingress-1.35.0
+    component: controller
+    heritage: Tiller
+    release: nginx-ingress
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:labels:
+          .: {}
+          f:app: {}
+          f:chart: {}
+          f:component: {}
+          f:heritage: {}
+          f:release: {}
+      f:spec:
+        f:externalTrafficPolicy: {}
+        f:ports:
+          .: {}
+          k:{"port":80,"protocol":"TCP"}:
+            .: {}
+            f:name: {}
+            f:port: {}
+            f:protocol: {}
+            f:targetPort: {}
+          k:{"port":443,"protocol":"TCP"}:
+            .: {}
+            f:name: {}
+            f:port: {}
+            f:protocol: {}
+            f:targetPort: {}
+        f:selector:
+          .: {}
+          f:app: {}
+          f:app.kubernetes.io/component: {}
+          f:release: {}
+        f:sessionAffinity: {}
+        f:type: {}
+    manager: Go-http-client
+    operation: Update
+    time: "2020-04-06T11:34:37Z"
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:finalizers:
+          .: {}
+          v:"service.kubernetes.io/load-balancer-cleanup": {}
+      f:status:
+        f:loadBalancer:
+          f:ingress: {}
+    manager: kube-controller-manager
+    operation: Update
+    time: "2020-04-06T11:34:45Z"
+  name: nginx-ingress-controller
+  namespace: default
+  resourceVersion: "4495"
+  selfLink: /api/v1/namespaces/default/services/nginx-ingress-controller
+  uid: ac190955-e250-4fc5-a10e-8f28c6db9480
+spec:
+  externalIPs:
+  - 172.16.1.196
+  - 172.16.2.76
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    nodePort: 30818
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    nodePort: 30616
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: nginx-ingress
+    app.kubernetes.io/component: controller
+    release: nginx-ingress
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - hostname: aac190955e2504fc5a10e8f28c6db948-1293474314.ap-south-1.elb.amazonaws.com
