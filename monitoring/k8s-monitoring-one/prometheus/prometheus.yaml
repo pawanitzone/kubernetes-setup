@@ -174,7 +174,7 @@ spec:
         - --storage.tsdb.path=/prometheus/
         - --web.enable-lifecycle
         - --storage.tsdb.no-lockfile
-        image: prom/prometheus:v2.4.3
+        image: prom/prometheus:v2.17.2
         name: prometheus
         ports:
         - containerPort: 9090
