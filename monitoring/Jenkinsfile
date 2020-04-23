@@ -10,7 +10,7 @@ pipeline {
   stages {
     stage('Deploy Prometheus-grafana-alertmanager Monitoring on GKE Platform') {
        steps{  
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/prometheus', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/prometheus/prometheus.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/alertmanager', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
  	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/grafana', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/kube-state-metrics', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
