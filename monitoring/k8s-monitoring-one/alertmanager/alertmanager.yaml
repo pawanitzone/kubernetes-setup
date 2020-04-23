@@ -111,8 +111,9 @@ metadata:
     prometheus.io/scrape: "true"
   labels:
     name: alertmanager
-    namespace: monitoring
+    
   name: alertmanager
+  namespace: monitoring
 spec:
   ports:
   - name: alertmanager
