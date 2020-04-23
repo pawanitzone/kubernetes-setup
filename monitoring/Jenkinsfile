@@ -8,25 +8,14 @@ pipeline {
                   
     }
   stages {
-   
-    stage('Deploy Prometheus on GKE Platform') {
+    stage('Deploy Prometheus-grafana-alertmanager Monitoring on GKE Platform') {
        steps{
-
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/00-prometheus-rbac.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/01-prometheus-configmap.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
- 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/02-prometheus-rules.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/03-prometheus-gke-storage.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/prometheus-service.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/prometheus-deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-
-       }
-      } 
-      stage('Deploy alertmanager on GKE Platform') {
-       steps{
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/alertmanager/00-alertmanager-configmap.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-           step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/alertmanager/alertmanager-configmap.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/alertmanager/alertmanager-service.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/alertmanager/alertmanager-deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/prometheus/prometheus.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/alertmanager', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+ 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/k8s-monitoring-one/grafana', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/kube-state-metrics', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/node-exporter', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/ingress.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 
        }
       }
