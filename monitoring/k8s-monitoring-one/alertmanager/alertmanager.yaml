@@ -142,7 +142,7 @@ spec:
       - args:
         - --config.file=/etc/alertmanager/config.yml
         - --storage.path=/alertmanager
-        image: prom/alertmanager:v0.15.3
+        image: prom/alertmanager:v0.20.0
         name: alertmanager
         ports:
         - containerPort: 9093
