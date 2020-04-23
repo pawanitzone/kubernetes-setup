@@ -7,6 +7,39 @@ metadata:
 parameters:
   type: pd-ssd
 provisioner: kubernetes.io/gce-pd
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: prometheus-pv
+  namespace: monitoring
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: prometheus-volume
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: fast
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-class: fast
+  name: prometheus-claim
+  namespace: monitoring
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  volumeName: prometheus-pv
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -202,35 +235,4 @@ spec:
       - configMap:
           name: prometheus-rules
         name: rules-volume
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: prometheus-pv
-  namespace: monitoring
-spec:
-  accessModes:
-  - ReadWriteOnce
-  capacity:
-    storage: 5Gi
-  gcePersistentDisk:
-    fsType: ext4
-    pdName: prometheus-volume
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: fast
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  annotations:
-    volume.beta.kubernetes.io/storage-class: fast
-  name: prometheus-claim
-  namespace: monitoring
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  volumeMode: Filesystem
-  volumeName: prometheus-pv
+
