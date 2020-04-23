@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - 03-prometheus-gke-storage.yaml
+  - 02-prometheus-rules.yaml
+  - 01-prometheus-configmap.yaml
+  - 00-prometheus-rbac.yaml
+  - prometheus-service.yaml
+  - prometheus-deployment.yaml
