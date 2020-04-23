@@ -1,0 +1,235 @@
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: fast
+  namespace: monitoring
+parameters:
+  type: pd-ssd
+provisioner: kubernetes.io/gce-pd
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: monitoring
+  namespace: monitoring
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: monitoring
+  namespace: monitoring
+---
+apiVersion: v1
+data:
+  alert.rules: "groups:\n  - name: Deployment\n    rules:\n    - alert: Deployment
+    at 0 Replicas\n      annotations:\n        summary: Deployment {{$labels.deployment}}
+    in {{$labels.namespace}} is currently having no pods running\n      expr: |\n
+    \       sum(kube_deployment_status_replicas{pod_template_hash=\"\"}) by (deployment,namespace)
+    \ < 1\n      for: 1m\n      labels:\n        team: devops\n\n    - alert: HPA
+    Scaling Limited  \n      annotations: \n        summary: HPA named {{$labels.hpa}}
+    in {{$labels.namespace}} namespace has reached scaling limited state\n      expr:
+    | \n        (sum(kube_hpa_status_condition{condition=\"ScalingLimited\",status=\"true\"})
+    by (hpa,namespace)) == 1\n      for: 1m\n      labels: \n        team: devops\n\n
+    \   - alert: HPA at MaxCapacity \n      annotations: \n        summary: HPA named
+    {{$labels.hpa}} in {{$labels.namespace}} namespace is running at Max Capacity\n
+    \     expr: | \n        ((sum(kube_hpa_spec_max_replicas) by (hpa,namespace))
+    - (sum(kube_hpa_status_current_replicas) by (hpa,namespace))) == 0\n      for:
+    1m\n      labels: \n        team: devops\n\n  - name: Pods\n    rules:\n    -
+    alert: Container restarted\n      annotations:\n        summary: Container named
+    {{$labels.container}} in {{$labels.pod}} in {{$labels.namespace}} was restarted\n
+    \     expr: |\n        sum(increase(kube_pod_container_status_restarts_total{namespace!=\"kube-system\",pod_template_hash=\"\"}[1m]))
+    by (pod,namespace,container) > 0\n      for: 0m\n      labels:\n        team:
+    dev\n\n    - alert: High Memory Usage of Container \n      annotations: \n        summary:
+    Container named {{$labels.container}} in {{$labels.pod}} in {{$labels.namespace}}
+    is using more than 75% of Memory Limit\n      expr: | \n        ((( sum(container_memory_usage_bytes{image!=\"\",container_name!=\"POD\",
+    namespace!=\"kube-system\"}) by (namespace,container_name,pod_name)  / sum(container_spec_memory_limit_bytes{image!=\"\",container_name!=\"POD\",namespace!=\"kube-system\"})
+    by (namespace,container_name,pod_name) ) * 100 ) < +Inf ) > 75\n      for: 5m\n
+    \     labels: \n        team: dev\n\n    - alert: High CPU Usage of Container
+    \n      annotations: \n        summary: Container named {{$labels.container}}
+    in {{$labels.pod}} in {{$labels.namespace}} is using more than 75% of CPU Limit\n
+    \     expr: | \n        ((sum(irate(container_cpu_usage_seconds_total{image!=\"\",container_name!=\"POD\",
+    namespace!=\"kube-system\"}[30s])) by (namespace,container_name,pod_name) / sum(container_spec_cpu_quota{image!=\"\",container_name!=\"POD\",
+    namespace!=\"kube-system\"} / container_spec_cpu_period{image!=\"\",container_name!=\"POD\",
+    namespace!=\"kube-system\"}) by (namespace,container_name,pod_name) ) * 100)  >
+    75\n      for: 5m\n      labels: \n        team: dev\n\n  - name: Nodes\n    rules:\n
+    \   - alert: High Node Memory Usage\n      annotations:\n        summary: Node
+    {{$labels.kubernetes_io_hostname}} has more than 80% memory used. Plan Capcity\n
+    \     expr: |\n        (sum (container_memory_working_set_bytes{id=\"/\",container_name!=\"POD\"})
+    by (kubernetes_io_hostname) / sum (machine_memory_bytes{}) by (kubernetes_io_hostname)
+    * 100) > 80\n      for: 5m\n      labels:\n        team: devops\n\n    - alert:
+    High Node CPU Usage\n      annotations:\n        summary: Node {{$labels.kubernetes_io_hostname}}
+    has more than 80% allocatable cpu used. Plan Capacity.\n      expr: |\n        (sum(rate(container_cpu_usage_seconds_total{id=\"/\",
+    container_name!=\"POD\"}[1m])) by (kubernetes_io_hostname) / sum(machine_cpu_cores)
+    by (kubernetes_io_hostname)  * 100) > 80\n      for: 5m\n      labels:\n        team:
+    devops\n\n    - alert: High Node Disk Usage\n      annotations:\n        summary:
+    Node {{$labels.kubernetes_io_hostname}} has more than 85% disk used. Plan Capacity.\n
+    \     expr: |\n        (sum(container_fs_usage_bytes{device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\",container_name!=\"POD\"})
+    by (kubernetes_io_hostname) / sum(container_fs_limit_bytes{container_name!=\"POD\",device=~\"^/dev/[sv]d[a-z][1-9]$\",id=\"/\"})
+    by (kubernetes_io_hostname)) * 100 > 85\n      for: 5m\n      labels:\n        team:
+    devops"
+kind: ConfigMap
+metadata:
+  labels:
+    name: prometheus-rules
+  name: prometheus-rules
+  namespace: monitoring
+---
+apiVersion: v1
+data:
+  prometheus.yml: "global:\n  scrape_interval: 5s\n  evaluation_interval: 5s\n\nrule_files:\n
+    \ - \"/etc/prometheus-rules/*.rules\"\n\nalerting:\n  alertmanagers:\n    - scheme:
+    http\n      path_prefix: /\n      static_configs:\n        - targets: ['alertmanager:9093']\n\nscrape_configs:\n-
+    job_name: kubernetes-nodes-cadvisor\n  scrape_interval: 10s\n  scrape_timeout:
+    10s\n  scheme: https\n  tls_config:\n    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n
+    \ bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  kubernetes_sd_configs:\n
+    \   - role: node\n  relabel_configs:\n    - action: labelmap\n      regex: __meta_kubernetes_node_label_(.+)\n
+    \   # Only for Kubernetes ^1.7.3.\n    # See: https://github.com/prometheus/prometheus/issues/2916\n
+    \   - target_label: __address__\n      replacement: kubernetes.default.svc:443\n
+    \   - source_labels: [__meta_kubernetes_node_name]\n      regex: (.+)\n      target_label:
+    __metrics_path__\n      replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor\n
+    \ metric_relabel_configs:\n    - action: replace\n      source_labels: [id]\n
+    \     regex: '^/machine\\.slice/machine-rkt\\\\x2d([^\\\\]+)\\\\.+/([^/]+)\\.service$'\n
+    \     target_label: rkt_container_name\n      replacement: '${2}-${1}'\n    -
+    action: replace\n      source_labels: [id]\n      regex: '^/system\\.slice/(.+)\\.service$'\n
+    \     target_label: systemd_service_name\n      replacement: '${1}'\n\n- job_name:
+    'kubernetes-pods'\n  kubernetes_sd_configs:\n    - role: pod\n  relabel_configs:\n
+    \   - action: labelmap\n      regex: __meta_kubernetes_pod_label_(.+)\n    - source_labels:
+    [__meta_kubernetes_namespace]\n      action: replace\n      target_label: kubernetes_namespace\n
+    \   - source_labels: [__meta_kubernetes_pod_name]\n      action: replace\n      target_label:
+    kubernetes_pod_name\n    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]\n
+    \     action: keep\n      regex: true\n    - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]\n
+    \     action: replace\n      target_label: __scheme__\n      regex: (https?)\n
+    \   - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]\n      action:
+    replace\n      target_label: __metrics_path__\n      regex: (.+)\n    - source_labels:
+    [__address__, __meta_kubernetes_pod_prometheus_io_port]\n      action: replace\n
+    \     target_label: __address__\n      regex: (.+)(?::\\d+);(\\d+)\n      replacement:
+    $1:$2\n\n\n- job_name: 'kubernetes-apiservers'\n  kubernetes_sd_configs:\n    -
+    role: endpoints\n  scheme: https \n  tls_config:\n    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n
+    \ bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n  relabel_configs:\n
+    \   - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name,
+    __meta_kubernetes_endpoint_port_name]\n      action: keep\n      regex: default;kubernetes;https\n\n-
+    job_name: 'kubernetes-service-endpoints'\n  kubernetes_sd_configs:\n    - role:
+    endpoints\n  relabel_configs:\n    - action: labelmap\n      regex: __meta_kubernetes_service_label_(.+)\n
+    \   - source_labels: [__meta_kubernetes_namespace]\n      action: replace\n      target_label:
+    kubernetes_namespace\n    - source_labels: [__meta_kubernetes_service_name]\n
+    \     action: replace\n      target_label: kubernetes_name\n    - source_labels:
+    [__meta_kubernetes_service_annotation_prometheus_io_scrape]\n      action: keep\n
+    \     regex: true\n    - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]\n
+    \     action: replace\n      target_label: __scheme__\n      regex: (https?)\n
+    \   - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]\n
+    \     action: replace\n      target_label: __metrics_path__\n      regex: (.+)\n
+    \   - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]\n
+    \     action: replace\n      target_label: __address__\n      regex: (.+)(?::\\d+);(\\d+)\n
+    \     replacement: $1:$2"
+kind: ConfigMap
+metadata:
+  labels:
+    name: prometheus-server-conf
+  name: prometheus-server-conf
+  namespace: monitoring
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  labels:
+    name: prometheus
+  name: prometheus-service
+  namespace: monitoring
+spec:
+  ports:
+  - name: prometheus
+    port: 9090
+    targetPort: 9090
+  selector:
+    app: prometheus-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-server
+  template:
+    metadata:
+      labels:
+        app: prometheus-server
+    spec:
+      containers:
+      - args:
+        - --config.file=/etc/prometheus/prometheus.yml
+        - --storage.tsdb.path=/prometheus/
+        - --web.enable-lifecycle
+        - --storage.tsdb.no-lockfile
+        image: prom/prometheus:v2.4.3
+        name: prometheus
+        ports:
+        - containerPort: 9090
+          name: prometheus
+        volumeMounts:
+        - mountPath: /etc/prometheus/
+          name: prometheus-config-volume
+        - mountPath: /prometheus/
+          name: prometheus-storage-volume
+        - mountPath: /etc/prometheus-rules
+          name: rules-volume
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 1000
+      serviceAccountName: monitoring
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: prometheus-server-conf
+        name: prometheus-config-volume
+      - name: prometheus-storage-volume
+        persistentVolumeClaim:
+          claimName: prometheus-claim
+      - configMap:
+          name: prometheus-rules
+        name: rules-volume
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-volume-1
+  namespace: monitoring
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 5Gi
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: prometheus-volume
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: fast
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-class: fast
+  name: prometheus-claim
+  namespace: monitoring
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
