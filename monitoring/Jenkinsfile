@@ -10,7 +10,6 @@ pipeline {
   stages {
     stage('Deploy Prometheus-grafana-alertmanager Monitoring on GKE Platform') {
        steps{  
-	          sh 'kubectl apply -f monitoring/prometheus'
 	          step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 		  step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/alertmanager', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
  		  step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/grafana', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
