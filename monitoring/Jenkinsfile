@@ -10,7 +10,7 @@ pipeline {
   stages {
     stage('Deploy Prometheus-grafana-alertmanager Monitoring on GKE Platform') {
        steps{  
-	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'prometheus', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'alertmanager', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
  	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'grafana', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'kube-state-metrics', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
