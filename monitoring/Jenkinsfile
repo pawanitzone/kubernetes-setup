@@ -10,7 +10,7 @@ pipeline {
   stages {
     stage('Deploy Prometheus on GKE Platform') {
        steps{
-           sh 'kubectl apply -f monitoring/prometheus/ '
+           
 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/00-prometheus-rbac.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/01-prometheus-configmap.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
  	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'monitoring/prometheus/02-prometheus-rules.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
