@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="062a67f9-31ef-4270-be73-f5b677a52ab8" name="Default Changelist" comment="Temporary adding">
-      <change beforePath="$PROJECT_DIR$/monitoring/alertmanager/00-alertmanager-configmap.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/monitoring/alertmanager/00-alertmanager-configmap.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

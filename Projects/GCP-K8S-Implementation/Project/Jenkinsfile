@@ -1,0 +1,25 @@
+pipeline {
+  agent any
+    environment {
+        PROJECT_ID = 'essential-smoke-274903'
+        LOCATION = 'us-central1-c'
+        CREDENTIALS_ID = 'gkeweb'
+        CLUSTER_NAME = 'hirelab'
+
+    }
+  stages {
+    stage('Deploy Fleetman app queue and mongodb on GKE Platform') {
+       steps{
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'Projects/GCP-K8S-Implementation/Project/storage.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'Projects/GCP-K8S-Implementation/Project/services.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+ 	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'Projects/GCP-K8S-Implementation/Project/mongo-stack.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+	       step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'Projects/GCP-K8S-Implementation/Project/workloads.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+
+       }
+      }
+
+  }
+}
+
+
+
