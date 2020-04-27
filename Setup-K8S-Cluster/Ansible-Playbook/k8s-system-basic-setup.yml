@@ -66,7 +66,7 @@
         path: /usr/lib/systemd/system/docker.service
         regexp: '^ExecStart='
         line: 'ExecStart=/usr/bin/dockerd --exec-opt native.cgroupdriver=systemd'
-   - name: cha
+   - name: change cgroupfs to systemd for kubelet service
      command: sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf 
   
    - name: Start docker and kubernetes services 
