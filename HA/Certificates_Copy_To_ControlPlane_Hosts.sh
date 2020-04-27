@@ -2,6 +2,7 @@
 ##sudo chmod 644 /etc/kubernetes/admin.conf /etc/kubernetes/pki/ca.key /etc/kubernetes/pki/etcd/ca.key /etc/kubernetes/pki/front-proxy-ca.key /etc/kubernetes/pki/sa.key /etc/kubernetes/pki/sa.pub
 ## Revert changes:
 ##sudo chmod 600 /etc/kubernetes/admin.conf /etc/kubernetes/pki/ca.key /etc/kubernetes/pki/etcd/ca.key /etc/kubernetes/pki/front-proxy-ca.key /etc/kubernetes/pki/sa.key /etc/kubernetes/pki/sa.pub
+sudo chmod 644 /etc/kubernetes/admin.conf /etc/kubernetes/pki/ca.key /etc/kubernetes/pki/etcd/ca.key /etc/kubernetes/pki/front-proxy-ca.key /etc/kubernetes/pki/sa.key /etc/kubernetes/pki/sa.pub
 USER=centos # customizable
 CONTROL_PLANE_IPS="172.16.1.163 172.16.1.217"
 for host in ${CONTROL_PLANE_IPS}; do
@@ -17,3 +18,5 @@ for host in ${CONTROL_PLANE_IPS}; do
     scp -r /etc/kubernetes/admin.conf "${USER}"@$host:/home/"${USER}"/certs
 done
 
+## Revert changes:
+sudo chmod 600 /etc/kubernetes/admin.conf /etc/kubernetes/pki/ca.key /etc/kubernetes/pki/etcd/ca.key /etc/kubernetes/pki/front-proxy-ca.key /etc/kubernetes/pki/sa.key /etc/kubernetes/pki/sa.pub
