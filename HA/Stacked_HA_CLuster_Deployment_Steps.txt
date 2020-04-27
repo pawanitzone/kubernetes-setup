@@ -1,0 +1,46 @@
+Requirement:
+
+-> You need total of 7 nodes minimum 5 nodes where 3 will be use to configure kubernetes cluster and 2 nodes will be use for haproxy/keepalive.
+   See details below for machines setup.
+
+
+##Stacked High Availability
+1. Setup Machines 
+	a. 3 machines for Kubeadm (Kubernetes Cluster) master nodes
+		Steps: Follow steps from this documents: kubernetes_Cluster_Labs.txt, (Follow till just before kubeadm init)
+	b. Atleast 2 machines for worker node
+	   Steps: Follow steps from this documents: kubernetes_Cluster_Labs.txt, (Follow till just before kubeadm init)
+	c. Minimun 2 nodes for haproxy server
+		Steps: 	
+		1. Install and configure haproxy. See steps in this directory
+		2. Install and configure keepalive . See configuration file in current directory
+		TestAfterDeployement: # nc -v LOAD_BALANCER_IP PORT
+
+		
+##Steps for the master control plane(Plane-1) node
+
+2. Initiate kubernetes_Cluster
+	a. See file in "kubeadm-config.yaml" 
+	b. kubeadm init --config=kubeadm-config.yaml
+	c. Copy Join command : #  kubeadm join haproxy.class.com:6443 --token dm004n.tldgitsq3ma05ar4 --discovery-token-ca-cert-hash sha256:8af8e6d10b6cc8497cd7e2f68d9bb85b2f9d471459c07958ebe1a6561bcd87d1
+
+3. Copy this output to a text file. You will need it later to join other control plane nodes to the cluster.
+
+4. Apply the Weave CNI plugin: # kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+
+5. Type the following and watch the pods of the components get started: # kubectl get pod -n kube-system -w
+
+6. Copy the certificate files from the first control plane node to the rest:  # ./Certificates_Copy_To_ControlPlane_Hosts.sh
+
+
+# Steps for the rest of the control plane nodes
+
+	a. Move the files created by the previous step where scp was used:  # ./Run_Script_On_ControlPlane.sh
+	b. Start kubeadm join on this node using the join command that was previously given to you by kubeadm init on the first node
+		# kubeadm join 192.168.0.200:6443 --token j04n3m.octy8zely83cy2ts --discovery-token-ca-cert-hash sha256:84938d2a22203a8e56a787ec0c6ddad7bc7dbd52ebabc62fd5f4dbea72b14d1f --experimental-control-plane
+		
+		NOTE: Notice the addition of the --experimental-control-plane flag. This flag automates joining this control plane node to the cluster.
+
+	c. Type the following and watch the pods of the components get started: # kubectl get pod -n kube-system -w
+	
+	d. Repeat these steps for the rest of the control plane nodes.
