@@ -5,6 +5,8 @@
 ### Deploy kubernetes network call flannel
 ### #kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
+## Requirement before Proceed:  Add all master and workers node in DNS or /etc/hosts
+
 #NOTE: If firewall is enabled on your installed RedHat/CentOS system, uncomment 17-21 lines which is commented below.
 #CREATED BY: pawanittraining@gmail.com
  
@@ -59,12 +61,13 @@
    - name: Backup docker.service file
      command: cp -r  /usr/lib/systemd/system/docker.service /usr/lib/systemd/system/docker.service.org
 
-   - name: change cgroupfs to systemd
+   - name: change cgroupfs to systemd in docker service
      lineinfile:
         path: /usr/lib/systemd/system/docker.service
         regexp: '^ExecStart='
         line: 'ExecStart=/usr/bin/dockerd --exec-opt native.cgroupdriver=systemd'
-
+   - name: cha
+     command: sed -i 's/cgroup-driver=systemd/cgroup-driver=cgroupfs/g' /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf 
   
    - name: Start docker and kubernetes services 
      command: "{{item}}"
