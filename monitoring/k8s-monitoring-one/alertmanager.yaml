@@ -5,7 +5,7 @@ data:
     smtp_require_tls: false\ntemplates:\n- '/etc/alertmanager-templates/*.tmpl'\nroute:\n
     \ group_by: ['alertname', 'cluster', 'service']\n  group_wait: 30s\n  group_interval:
     30s\n  repeat_interval: 1m  \n  receiver: mail\n\nreceivers:\n - name: 'mail'\n
-    \  email_configs:\n   - to: awspractice1999@gmail.com\n     smarthost: smtp.gmail.com:465\n
+    \  email_configs:\n   - to: awspractice1999@gmail.com\n auth_username: "$smtp_auth_username"\n auth_password: "$smtp_auth_password"\n    smarthost: smtp.gmail.com:465\n
     \    \n     send_resolved: true"
 kind: ConfigMap
 metadata:
