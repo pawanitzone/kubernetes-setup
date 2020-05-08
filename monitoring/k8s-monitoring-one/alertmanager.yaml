@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: email-password
+type: Opaque
+data:
+  password: ZGNtYXljZnlqcmxnaHN3eQ==
+---
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -9,7 +17,7 @@ data:
      smtp_smarthost: smtp.gmail.com:465
      smtp_from: alertmanager@hire.com
      smtp_auth_username: awspractice1999@gmail.com
-     smtp_auth_password: 'dcmaycfyjrlghswy'
+     smtp_auth_password: "$email-password"
      smtp_require_tls: false
     templates:
     - '/etc/alertmanager-templates/*.tmpl'
@@ -26,7 +34,7 @@ data:
        - to: awspractice1999@gmail.com
          smarthost: smtp.gmail.com:465
          auth_username: awspractice1999@gmail.com
-         auth_password: 'dcmaycfyjrlghswy'
+         auth_password: "$email-password"
 
          send_resolved: true
 
@@ -74,6 +82,12 @@ spec:
         - --storage.path=/alertmanager
         image: prom/alertmanager:v0.20.0
         name: alertmanager
+        env:
+          - name: email-password
+            valueFrom:
+              secretKeyRef:
+                name: email-password
+                key: password
         ports:
         - containerPort: 9093
           name: alertmanager
