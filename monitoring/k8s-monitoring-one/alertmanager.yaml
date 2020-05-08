@@ -17,7 +17,7 @@ data:
      smtp_smarthost: smtp.gmail.com:465
      smtp_from: alertmanager@hire.com
      smtp_auth_username: awspractice1999@gmail.com
-     smtp_auth_password: "$email-password"
+     smtp_auth_password: '$email-password'
      smtp_require_tls: false
     templates:
     - '/etc/alertmanager-templates/*.tmpl'
@@ -34,7 +34,7 @@ data:
        - to: awspractice1999@gmail.com
          smarthost: smtp.gmail.com:465
          auth_username: awspractice1999@gmail.com
-         auth_password: "$email-password"
+         auth_password: '$email-password'
 
          send_resolved: true
 
