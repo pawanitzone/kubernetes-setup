@@ -25,8 +25,8 @@ data:
        email_configs:
        - to: awspractice1999@gmail.com
          smarthost: smtp.gmail.com:465
-         auth_username: "$smtp_auth_username"
-         auth_password: "$smtp_auth_password"
+         auth_username: awspractice1999@gmail.com
+         auth_password: 'dcmaycfyjrlghswy'
 
          send_resolved: true
 
