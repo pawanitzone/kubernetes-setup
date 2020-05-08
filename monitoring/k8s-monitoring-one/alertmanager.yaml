@@ -82,12 +82,6 @@ spec:
         - --storage.path=/alertmanager
         image: prom/alertmanager:v0.20.0
         name: alertmanager
-        env:
-          - name: email-password
-            valueFrom:
-              secretKeyRef:
-                name: email-password
-                key: password
         ports:
         - containerPort: 9093
           name: alertmanager
