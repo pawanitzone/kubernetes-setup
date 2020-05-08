@@ -1,16 +1,35 @@
-apiVersion: v1
-data:
-  config.yml: "global:\n smtp_smarthost: smtp.gmail.com:465\n smtp_from: alertmanager@hire.com\n
-    smtp_auth_username: awspractice1999@gmail.com\n smtp_auth_password: 'dcmaycfyjrlghswy'\n
-    smtp_require_tls: false\ntemplates:\n- '/etc/alertmanager-templates/*.tmpl'\nroute:\n
-    \ group_by: ['alertname', 'cluster', 'service']\n  group_wait: 30s\n  group_interval:
-    30s\n  repeat_interval: 1m  \n  receiver: mail\n\nreceivers:\n - name: 'mail'\n
-    \  email_configs:\n   - to: awspractice1999@gmail.com\n auth_username: "$smtp_auth_username"\n auth_password: "$smtp_auth_password"\n    smarthost: smtp.gmail.com:465\n
-    \    \n     send_resolved: true"
 kind: ConfigMap
+apiVersion: v1
 metadata:
   name: alertmanager
   namespace: monitoring
+data:
+  config.yml: |-
+    global:
+     smtp_smarthost: smtp.gmail.com:465
+     smtp_from: alertmanager@hire.com
+     smtp_auth_username: awspractice1999@gmail.com
+     smtp_auth_password: 'dcmaycfyjrlghswy'
+     smtp_require_tls: false
+    templates:
+    - '/etc/alertmanager-templates/*.tmpl'
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 30s
+      group_interval: 30s
+      repeat_interval: 1m
+      receiver: mail
+
+    receivers:
+     - name: 'mail'
+       email_configs:
+       - to: awspractice1999@gmail.com
+         smarthost: smtp.gmail.com:465
+         auth_username: "$smtp_auth_username"
+         auth_password: "$smtp_auth_password"
+
+         send_resolved: true
+
 
 ---
 apiVersion: v1
