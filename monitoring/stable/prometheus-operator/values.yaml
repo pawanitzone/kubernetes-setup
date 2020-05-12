@@ -1738,14 +1738,14 @@ prometheus:
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/storage.md
     ##
-    storageSpec: {}
+    storageSpec: 
       volumeClaimTemplate:
         spec:
           # Name of the PV you created beforehand
           volumeName: prometheus-pv
           accessModes: ["ReadWriteOnce"]
           # StorageClass should match your existing PV's storage class
-          storageClassName: ssd
+          storageClassName: ""
           resources:
             requests:
               # Size below should match your existing PV's size
