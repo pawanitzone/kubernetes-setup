@@ -1,0 +1,22 @@
+Also create Disk volume for persistent volume to be moount with prometheus server PV Claim.
+templates/prometheus-pv.yaml
+
+##To modified value for persistent volumes to me mount with prometheus server pod
+
+# Search for 'storageSpec: {}'  and ## Modified "values.yaml"
+
+## Prometheus StorageSpec for persistent data
+    ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/storage.md
+    ##
+    storageSpec: 
+      volumeClaimTemplate:
+        spec:
+          # Name of the PV you created beforehand
+          volumeName: prometheus-pv
+          accessModes: ["ReadWriteOnce"]
+          # StorageClass should match your existing PV's storage class
+          storageClassName: ""
+          resources:
+            requests:
+              # Size below should match your existing PV's size
+              storage: 10Gi
