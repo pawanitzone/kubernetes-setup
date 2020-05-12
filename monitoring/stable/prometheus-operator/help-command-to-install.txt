@@ -1,0 +1,10 @@
+#Install Prometheus Operator
+git clone https://github.com/pawanitzone/kubernetes.git
+cd kubernetes/monitoring/stable/prometheus-operator
+helm dep update
+helm install --name prometheus-operator ../prometheus-operator --namespace monitoring
+
+###Delete prometheus operator completely
+helm delete prometheus-operator
+helm del --purge prometheus-operator
+kubectl delete crd alertmanagers.monitoring.coreos.com prometheuses.monitoring.coreos.com prometheusrules.monitoring.coreos.com servicemonitors.monitoring.coreos.com thanosrulers.monitoring.coreos.com  podmonitors.monitoring.coreos.com  -n monitoring
