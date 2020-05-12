@@ -1739,6 +1739,17 @@ prometheus:
     ## ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/storage.md
     ##
     storageSpec: {}
+      volumeClaimTemplate:
+        spec:
+          # Name of the PV you created beforehand
+          volumeName: prometheus-pv
+          accessModes: ["ReadWriteOnce"]
+          # StorageClass should match your existing PV's storage class
+          storageClassName: ssd
+          resources:
+            requests:
+              # Size below should match your existing PV's size
+              storage: 10Gi
       #  volumeClaimTemplate:
       #    spec:
       #      storageClassName: gluster
