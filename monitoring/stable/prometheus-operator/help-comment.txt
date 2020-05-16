@@ -2,7 +2,7 @@ Also create Disk volume for persistent volume to be moount with prometheus serve
 templates/prometheus-pv.yaml
 
 ##To modified value for persistent volumes to me mount with prometheus server pod
-
+##Edit values.yaml
 # Search for 'storageSpec: {}'  and ## Modified "values.yaml"
 
 ## Prometheus StorageSpec for persistent data
