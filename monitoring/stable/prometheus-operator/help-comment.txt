@@ -1,5 +1,6 @@
 Also create Disk volume for persistent volume to be moount with prometheus server PV Claim.
-templates/prometheus-pv.yaml
+prometheus-operator/templates/prometheus-operator/prometheus-operator-pv.yaml
+
 
 ##To modified value for persistent volumes to me mount with prometheus server pod
 ##Edit values.yaml
