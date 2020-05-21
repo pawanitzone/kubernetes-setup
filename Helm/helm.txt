@@ -41,6 +41,15 @@ helm repo update
 helm install stable/nginx-ingress --name nginx-ingress --set controller.publishService.enabled=true
 
 
+###enable ssl while deploying nginx ingress
+helm upgrade ingress stable/nginx-ingress \
+  --install \
+  --set rbac.create=true \
+  --set "controller.extraArgs.enable-ssl-passthrough=" \
+  --set controller.hostNetwork=true \
+  --set “controller.extraArgs.report-node-internal-ip-address="
+
+
 NOTE:  ####
 - nginx ingress controller service doesn't pick loadbalancer IP on bare metal kubernetes cluster. So need to manually configure 
 - kubectl get svc
