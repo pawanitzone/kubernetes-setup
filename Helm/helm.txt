@@ -47,8 +47,17 @@ subjects:
     name: tiller
     namespace: kube-system
 -------------------------------
+OR:
 
-      
+kubectl create clusterrolebinding tiller \
+>   --clusterrole=cluster-admin \
+>   --serviceaccount=kube-system:tiller
+
+
+
+
+
+----------------------------------------------------
 helm init --service-account tiller --upgrade
 helm ls (Verify for service account working for helm)
 
