@@ -8,7 +8,7 @@ metadata:
     kubernetes.io/name: grafana
  #   cloud.google.com/load-balancer-type: "Internal"
   name: grafana
-  namespace: monitoring
+
 spec:
 #  type: LoadBalancer
   ports:

@@ -4,7 +4,7 @@ metadata:
   name: prometheus-rules
   labels:
     name: prometheus-rules
-  namespace: monitoring
+
 data:
   alert.rules: |-
     groups:

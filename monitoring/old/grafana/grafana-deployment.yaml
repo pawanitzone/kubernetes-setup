@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana
-  namespace: monitoring
+
 spec:
   replicas: 1
   selector:
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: k8s.gcr.io/heapster-grafana-amd64:v5.0.4
+        image: grafana/grafana:6.7.3
         ports:
         - containerPort: 3000
           protocol: TCP
@@ -26,6 +26,10 @@ spec:
           readOnly: true
         - mountPath: /var
           name: grafana-storage
+
+        volumeMounts:
+        - name: prometheus-storage-volume
+          mountPath: /grafana/
         env:
         - name: GF_SERVER_HTTP_PORT
           value: "3000"
@@ -49,4 +53,7 @@ spec:
           path: /etc/ssl/certs
       - name: grafana-storage
         emptyDir: {}
+      - name: grafana-storage-volume
+          persistentVolumeClaim:
+            claimName: grafana-claim
 ---

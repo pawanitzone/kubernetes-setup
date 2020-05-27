@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: node-exporter
-  namespace: monitoring
+
   labels:
     name: node-exporter
 spec:
@@ -22,7 +22,7 @@ spec:
       hostNetwork: true
       containers:
         - name: node-exporter
-          image: prom/node-exporter:v0.16.0
+          image: prom/node-exporter:v1.0.0
           securityContext:
             privileged: true
           args:

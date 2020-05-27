@@ -1,35 +1,40 @@
-apiVersion: storage.k8s.io/v1
+apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
 metadata:
-  name: local-storage
-  namespace: monitoring
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
+  name: fast
+
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+allowVolumeExpansion: true
 ---
 apiVersion: "v1"
 kind: "PersistentVolume"
 metadata:
   name: data-volume-1
-  namespace: monitoring
+
 spec:
   capacity:
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  hostPath:
-    path: "/opt/k8-disk/prometheus"
+  storageClassName: fast
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: prometheus-volume
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: prometheus-claim
-  namespace: monitoring
+
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "fast"
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-storage
+  volumeMode: Filesystem
   resources:
     requests:
       storage: 5Gi

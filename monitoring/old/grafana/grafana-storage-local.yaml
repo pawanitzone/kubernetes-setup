@@ -1,0 +1,34 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: grafana-local-storage
+
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: "v1"
+kind: "PersistentVolume"
+metadata:
+  name: grafana-vol
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: grafana-local-storage
+  hostPath:
+    path: "/opt/k8-disk/prometheus"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: grafana-claim
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: grafana-local-storage
+  resources:
+    requests:
+      storage: 2Gi

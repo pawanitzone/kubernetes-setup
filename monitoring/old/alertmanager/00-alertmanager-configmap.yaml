@@ -2,14 +2,13 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: alertmanager
-  namespace: monitoring
 data:
   config.yml: |-
     global:
      smtp_smarthost: smtp.gmail.com:465
      smtp_from: alertmanager@hire.com
      smtp_auth_username: awspractice1999@gmail.com
-     smtp_auth_password: 'saeqfawbjvhzbng'
+     smtp_auth_password: 'dcmaycfyjrlghswy'
      smtp_require_tls: false
     templates:
     - '/etc/alertmanager-templates/*.tmpl'
