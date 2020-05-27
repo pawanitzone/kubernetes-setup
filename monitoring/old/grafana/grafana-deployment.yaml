@@ -28,7 +28,7 @@ spec:
           name: grafana-storage
 
         volumeMounts:
-        - name: prometheus-storage-volume
+        - name: grafana-storage-volume
           mountPath: /grafana/
         env:
         - name: GF_SERVER_HTTP_PORT
