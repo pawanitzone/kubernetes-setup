@@ -1,0 +1,7 @@
+$ kubectl get ingress
+$ kubectl describe ingress --namespace app-space
+$ kubectl create ns ingress-space
+$ kubectl create configmap nginx-configuration --namespace ingress-space
+$ kubectl create serviceaccount ingress-serviceaccount --namespace ingress-space
+$ kubectl get roles,rolebindings --namespace ingress-space
+$ kubectl expose deployment -n ingress-space ingress-controller --type=NodePort --port=80 --name=ingress --dry-run -o yaml > ingress.yaml
