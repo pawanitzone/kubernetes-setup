@@ -1,0 +1,13 @@
+$ curl http://web-service.apps.svc.cluster.local
+$ curl http://10-10-10-5.apps.pod.cluster.local
+$ cat /etc/coredns/Corefile
+$ kubectl get configmap -n kube-system
+$ kubectl get service -n kube-system
+$ ps aux | grep coredns
+
+-conf /etc/coredns/Corefile
+
+$ kubectl exec <coredns pod> -n kube-system ps
+$ kubectl describe configmap coredns -n kube-system
+$ kubectl set env deployment/webapp DB_Host=mysql.payroll
+$ kubectl exec -it hr nslookup mysql.payroll > /root/nslookup.out
