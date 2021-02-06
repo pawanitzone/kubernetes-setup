@@ -2,11 +2,11 @@ allowVolumeExpansion: true
 apiVersion: storage.k8s.io/v1beta1
 kind: StorageClass
 metadata:
-  name: standard
+  name: fast
   namespace: monitoring
 parameters:
   type: pd-ssd
-provisioner: kubernetes.io/aws-ebs
+provisioner: kubernetes.io/gcp-pd
 
 ---
 apiVersion: v1
