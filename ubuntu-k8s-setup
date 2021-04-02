@@ -1,3 +1,5 @@
+##Run this command on all master worker nodes
+
 1  sudo apt-get install     apt-transport-https     ca-certificates     curl     gnupg     lsb-release
 2  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 3  echo   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
@@ -19,3 +21,8 @@ EOF
 11  echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 12  sudo apt-get update
 13  sudo apt-get install -y kubelet kubeadm kubectl
+
+
+#### kubeadm init on master node
+After kubeadm init install weave network on master
+# kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
